@@ -1,15 +1,33 @@
 <template>
-  <div class="home flex-grow-1 d-flex flex-column align-items-center justify-content-center">
-    <img src="https://bcw.blob.core.windows.net/public/img/8600856373152463" alt="CodeWorks Logo">
-    <h1 class="my-5 bg-dark text-light p-3 rounded d-flex align-items-center">
-      <span class="mx-2 text-white">Vue 3 Starter</span>
-    </h1>
+  <div class="home container flex-grow-1 d-flex flex-column align-items-center justify-content-center">
+    <div class="row">
+      <Blog v-for="blog in state.blogs" :key="blog.id" :blog="blog" />
+    </div>
   </div>
 </template>
 
 <script>
+import { onMounted, reactive, computed } from 'vue'
+import Notification from '../utils/Notification'
+import { blogsService } from '../services/BlogsService'
+import { AppState } from '../AppState'
 export default {
-  name: 'Home'
+  name: 'Home',
+  setup() {
+    const state = reactive({
+      blogs: computed(() => AppState.blogs)
+    })
+    onMounted(async() => {
+      try {
+        await blogsService.getAll()
+      } catch (error) {
+        Notification.toast('Error: ' + error, 'error')
+      }
+    })
+    return {
+      state
+    }
+  }
 }
 </script>
 
